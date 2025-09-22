@@ -29,11 +29,10 @@ export default function NavigationSystem({ steps, onStepChange, data }: Navigati
 
   const navigateToStep = (index: number) => {
     if (index >= 0 && index < steps.length) {
-      // Check if step requires completion of previous steps
       if (steps[index].requiresCompletion && index > 0) {
         const previousStepId = steps[index - 1].id;
         if (!completedSteps.includes(previousStepId)) {
-          return; // Don't allow navigation to locked step
+          return;
         }
       }
       
@@ -76,10 +75,8 @@ export default function NavigationSystem({ steps, onStepChange, data }: Navigati
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Navigation Header */}
       <div className="sticky top-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto px-6 py-4">
-          {/* Progress Steps */}
           <div className="flex items-center justify-center space-x-2 md:space-x-4 overflow-x-auto pb-2">
             {steps.map((step, index) => {
               const Icon = step.icon;
@@ -119,10 +116,8 @@ export default function NavigationSystem({ steps, onStepChange, data }: Navigati
         </div>
       </div>
 
-      {/* Main Content Area */}
       <div className="container mx-auto px-6 py-8">
-        {/* Step Header */}
-        <motion.div 
+        <motion.div
           key={currentStep.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -137,7 +132,6 @@ export default function NavigationSystem({ steps, onStepChange, data }: Navigati
           </p>
         </motion.div>
 
-        {/* Step Content */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep.id}
@@ -155,7 +149,6 @@ export default function NavigationSystem({ steps, onStepChange, data }: Navigati
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation Controls */}
         <div className="flex justify-between items-center mt-8">
           <motion.button
             onClick={prevStep}
@@ -185,7 +178,6 @@ export default function NavigationSystem({ steps, onStepChange, data }: Navigati
         </div>
       </div>
 
-      {/* Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>

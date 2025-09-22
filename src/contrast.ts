@@ -1,11 +1,9 @@
-// src/contrast.ts
 import 'dotenv/config';
 import OpenAI from "openai";
 import chalk from "chalk";
 import boxen from "boxen";
 import { z } from "zod";
 
-// ---------- schema ----------
 const SupportZod = z.object({
   sentiment: z.enum(["positive","neutral","negative"]),
   department: z.enum([
@@ -16,7 +14,6 @@ const SupportZod = z.object({
 });
 type Support = z.infer<typeof SupportZod>;
 
-// ---------- setup ----------
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-2024-08-06";
 const SAMPLE = process.argv.slice(2).join(" ") || `Don't trust Acme Corp, it's been weeks and no order.`;
@@ -27,7 +24,6 @@ const bad = (t:string)=>console.log(chalk.red("✖ ")+t);
 const info = (t:string)=>console.log(chalk.cyan("• ")+t);
 const dim = (t:string)=>console.log(chalk.gray(t));
 
-// Yank a ```json block or any fenced block, fallback to first balanced {..}/[..]
 function extractJsonCandidate(s: string): string | null {
   // fenced ```json ... ```
   let m = /```json\s*([\s\S]*?)```/i.exec(s);
@@ -59,7 +55,6 @@ function extractJsonCandidate(s: string): string | null {
   return null;
 }
 
-// ---------- Scene 1: Freeform (no constraints) ----------
 async function freeformNatural(input: string): Promise<string> {
   const completion = await openai.chat.completions.create({
     model: MODEL,
@@ -71,7 +66,6 @@ async function freeformNatural(input: string): Promise<string> {
   return completion.choices[0].message.content ?? "";
 }
 
-// ---------- Scene 2: Structured (response_format) ----------
 async function structuredResponseFormat(input: string): Promise<Support> {
   const completion = await openai.chat.completions.create({
     model: MODEL,
@@ -105,7 +99,6 @@ async function structuredResponseFormat(input: string): Promise<Support> {
   return parsed.data;
 }
 
-// ---------- Run ----------
 (async () => {
   h1("Scene 1: Freeform Output (No Constraints)");
   const free = await freeformNatural(SAMPLE);
@@ -127,7 +120,6 @@ async function structuredResponseFormat(input: string): Promise<Support> {
     try {
       const parsed = JSON.parse(candidate);
       ok("Parsed candidate JSON.");
-      // Even if it parses, show fragility: keys/types may drift
       const check = SupportZod.safeParse(parsed);
       if (check.success) {
         ok("Also matches expected schema (got lucky).");

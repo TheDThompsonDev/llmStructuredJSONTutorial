@@ -72,7 +72,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
       for (let i = 0; i < processingSteps.length; i++) {
         setCurrentStep(i);
         
-        // Simulate API call for the actual processing step
         if (i === 1) {
           try {
             const response = await fetch('/api/process', {
@@ -85,7 +84,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
               const result = await response.json();
               setProcessingResult(result);
               
-              // Store result in data context
               if (data) {
                 data.result = result;
               }
@@ -99,7 +97,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
       
       setIsComplete(true);
       
-      // Auto-advance immediately after processing
       onComplete();
       onNext();
     };
@@ -109,8 +106,7 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Processing Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
@@ -128,8 +124,7 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
         </p>
       </motion.div>
 
-      {/* Message Display */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl mb-12"
@@ -152,7 +147,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
         </div>
       </motion.div>
 
-      {/* Processing Steps */}
       <div className="space-y-6">
         {processingSteps.map((step, index) => {
           const Icon = step.icon;
@@ -174,7 +168,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
                     : 'bg-white/5 border-white/10'
               }`}
             >
-              {/* Step Icon */}
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center relative ${
                 isActive 
                   ? `bg-gradient-to-r ${step.color}` 
@@ -190,7 +183,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
                       : 'text-gray-400'
                 }`} />
                 
-                {/* Active indicator */}
                 {isActive && (
                   <motion.div
                     className="absolute inset-0 rounded-2xl border-2 border-white/50"
@@ -206,7 +198,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
                 )}
               </div>
 
-              {/* Step Content */}
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className={`text-xl font-semibold ${
@@ -242,7 +233,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
                   {step.description}
                 </p>
 
-                {/* Progress bar for active step */}
                 {isActive && (
                   <motion.div
                     className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden"
@@ -259,7 +249,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
                 )}
               </div>
 
-              {/* Status indicator */}
               <div className="flex items-center">
                 {isCompleted && (
                   <motion.div
@@ -288,7 +277,6 @@ export default function ProcessingStep({ data, onComplete, onNext }: ProcessingS
         })}
       </div>
 
-      {/* Processing Stats */}
       <AnimatePresence>
         {processingResult && (
           <motion.div

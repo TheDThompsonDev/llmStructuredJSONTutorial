@@ -46,7 +46,6 @@ export default function ResultsStep({ data, onComplete, onNext }: ResultsStepPro
   const routing = data?.result?.routing;
   const analysis = data?.result?.analysis;
 
-  // Mock traditional routing metrics for comparison
   const traditionalMetrics = {
     averageTime: 4.2,
     accuracy: 68,
@@ -117,8 +116,7 @@ export default function ResultsStep({ data, onComplete, onNext }: ResultsStepPro
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Results Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
@@ -136,14 +134,12 @@ export default function ResultsStep({ data, onComplete, onNext }: ResultsStepPro
         </p>
       </motion.div>
 
-      {/* Main Results Card */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl mb-8"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Routing Decision */}
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className={`p-3 bg-gradient-to-r ${selectedDept.color} rounded-xl`}>
@@ -185,7 +181,6 @@ export default function ResultsStep({ data, onComplete, onNext }: ResultsStepPro
             </div>
           </div>
 
-          {/* Analysis Details */}
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl">
@@ -247,8 +242,7 @@ export default function ResultsStep({ data, onComplete, onNext }: ResultsStepPro
         </div>
       </motion.div>
 
-      {/* Performance Comparison Toggle */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -263,7 +257,6 @@ export default function ResultsStep({ data, onComplete, onNext }: ResultsStepPro
         </button>
       </motion.div>
 
-      {/* Performance Comparison */}
       <AnimatePresence>
         {showComparison && (
           <motion.div
@@ -353,8 +346,7 @@ export default function ResultsStep({ data, onComplete, onNext }: ResultsStepPro
         )}
       </AnimatePresence>
 
-      {/* Action Buttons */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
@@ -380,7 +372,6 @@ export default function ResultsStep({ data, onComplete, onNext }: ResultsStepPro
         </button>
       </motion.div>
 
-      {/* Department Detail Modal */}
       {selectedDepartment && (
         <DepartmentDetailModal
           isOpen={!!selectedDepartment}

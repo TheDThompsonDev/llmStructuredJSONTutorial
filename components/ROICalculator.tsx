@@ -6,21 +6,21 @@ import { Calculator, DollarSign, Clock, TrendingUp, Users, Zap, CheckCircle } fr
 
 interface ROIMetrics {
   monthlyTickets: number;
-  avgManualProcessingTime: number; // minutes
-  hourlyRate: number; // dollars
-  currentAccuracy: number; // percentage
-  aiProcessingTime: number; // minutes
-  aiAccuracy: number; // percentage
-  implementationCost: number; // dollars
+  avgManualProcessingTime: number;
+  hourlyRate: number;
+  currentAccuracy: number;
+  aiProcessingTime: number;
+  aiAccuracy: number;
+  implementationCost: number;
 }
 
 interface ROIResults {
-  timeSavingsPerMonth: number; // hours
-  costSavingsPerMonth: number; // dollars
-  costSavingsPerYear: number; // dollars
-  accuracyImprovement: number; // percentage
-  paybackPeriod: number; // months
-  roi: number; // percentage
+  timeSavingsPerMonth: number;
+  costSavingsPerMonth: number;
+  costSavingsPerYear: number;
+  accuracyImprovement: number;
+  paybackPeriod: number;
+  roi: number;
   ticketsProcessedPerHour: number;
   manualTicketsPerHour: number;
 }
@@ -71,7 +71,6 @@ export default function ROICalculator() {
     const newResults = calculateROI(metrics);
     setResults(newResults);
     
-    // Set values immediately
     setAnimatedValues(newResults);
   }, [metrics]);
 
@@ -97,7 +96,6 @@ export default function ROICalculator() {
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      {/* Header */}
       <div className="glass-effect rounded-2xl p-6">
         <div className="text-center space-y-4">
           <h3 className="text-2xl font-bold gradient-text flex items-center justify-center gap-2">
@@ -112,7 +110,6 @@ export default function ROICalculator() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Input Parameters */}
         <div className="glass-effect rounded-2xl p-6">
           <h4 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
             <Users className="w-6 h-6 text-blue-600" />
@@ -197,9 +194,7 @@ export default function ROICalculator() {
           </div>
         </div>
 
-        {/* Results */}
         <div className="space-y-6">
-          {/* Key Metrics */}
           {results && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -267,7 +262,6 @@ export default function ROICalculator() {
             </motion.div>
           )}
 
-          {/* Performance Comparison */}
           {results && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -307,7 +301,6 @@ export default function ROICalculator() {
             </motion.div>
           )}
 
-          {/* Business Impact Summary */}
           {results && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}

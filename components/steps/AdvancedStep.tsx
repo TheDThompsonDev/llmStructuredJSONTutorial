@@ -114,8 +114,7 @@ export default function AdvancedStep({ data, onComplete, onNext }: AdvancedStepP
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
@@ -133,8 +132,7 @@ export default function AdvancedStep({ data, onComplete, onNext }: AdvancedStepP
         </p>
       </motion.div>
 
-      {/* Key Metrics Dashboard */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -170,8 +168,7 @@ export default function AdvancedStep({ data, onComplete, onNext }: AdvancedStepP
         ))}
       </motion.div>
 
-      {/* Feature Selection */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -225,7 +222,6 @@ export default function AdvancedStep({ data, onComplete, onNext }: AdvancedStepP
         </div>
       </motion.div>
 
-      {/* Feature Demo */}
       <AnimatePresence mode="wait">
         <motion.div
           key={selectedFeature}
@@ -339,8 +335,7 @@ export default function AdvancedStep({ data, onComplete, onNext }: AdvancedStepP
         </motion.div>
       </AnimatePresence>
 
-      {/* Action Button */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}

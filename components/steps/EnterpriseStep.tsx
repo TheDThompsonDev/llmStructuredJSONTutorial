@@ -139,8 +139,7 @@ export default function EnterpriseStep({ data, onComplete, onNext }: EnterpriseS
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
@@ -158,8 +157,7 @@ export default function EnterpriseStep({ data, onComplete, onNext }: EnterpriseS
         </p>
       </motion.div>
 
-      {/* Enterprise Benefits */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -190,8 +188,7 @@ export default function EnterpriseStep({ data, onComplete, onNext }: EnterpriseS
         })}
       </motion.div>
 
-      {/* Enterprise Tools */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -204,7 +201,6 @@ export default function EnterpriseStep({ data, onComplete, onNext }: EnterpriseS
           </p>
         </div>
 
-        {/* Tool Selection */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {enterpriseTools.map((tool) => {
             const Icon = tool.icon;
@@ -247,7 +243,6 @@ export default function EnterpriseStep({ data, onComplete, onNext }: EnterpriseS
           })}
         </div>
 
-        {/* Tool Demo */}
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedToolId}
@@ -275,8 +270,7 @@ export default function EnterpriseStep({ data, onComplete, onNext }: EnterpriseS
         </AnimatePresence>
       </motion.div>
 
-      {/* Case Studies */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
@@ -323,8 +317,7 @@ export default function EnterpriseStep({ data, onComplete, onNext }: EnterpriseS
         </div>
       </motion.div>
 
-      {/* Final CTA */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}

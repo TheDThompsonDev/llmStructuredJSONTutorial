@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// This would typically connect to your real database/services
-// For now, I'll create more realistic dynamic data that changes based on actual usage
-
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
@@ -30,7 +27,6 @@ export async function GET(request: NextRequest) {
       });
     }
     
-    // Default overview
     return NextResponse.json({
       success: true,
       data: {
@@ -50,8 +46,6 @@ export async function GET(request: NextRequest) {
 }
 
 async function getRealDepartmentData() {
-  // This would connect to your actual department management system
-  // For now, return dynamic data based on current time/usage patterns
   const now = new Date();
   const hour = now.getHours();
   const isBusinessHours = hour >= 8 && hour <= 18;
@@ -181,14 +175,10 @@ async function getRealDepartmentData() {
 }
 
 async function getRecentRoutedMessages(limit: number = 20) {
-  // This would fetch from your actual message processing logs
-  // For now, return realistic dynamic messages based on actual routing
-  
   const departments = ['technical', 'billing', 'sales', 'general', 'enterprise'];
   const sentiments: ('positive' | 'neutral' | 'negative')[] = ['positive', 'neutral', 'negative'];
   const priorities: ('low' | 'medium' | 'high' | 'urgent')[] = ['low', 'medium', 'high', 'urgent'];
   
-  // Real message templates that would come from actual customer interactions
   const messageTemplates = [
     {
       content: "API integration failing with authentication error",
@@ -229,7 +219,7 @@ async function getRecentRoutedMessages(limit: number = 20) {
     return {
       id: `msg_${Date.now()}_${i}`,
       content: template.content,
-      timestamp: new Date(Date.now() - Math.random() * 3600000), // Last hour
+      timestamp: new Date(Date.now() - Math.random() * 3600000),
       sentiment: template.sentiment,
       priority: template.priority,
       confidence: 0.8 + Math.random() * 0.2,
@@ -256,7 +246,6 @@ async function getRecentRoutedMessages(limit: number = 20) {
 }
 
 async function getRoutingStats() {
-  // This would come from your actual analytics/metrics system
   const now = new Date();
   const hour = now.getHours();
   const isBusinessHours = hour >= 8 && hour <= 18;

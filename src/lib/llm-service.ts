@@ -30,7 +30,6 @@ export interface LLMResult {
   confidence?: number;
 }
 
-// Enhanced service with real-time streaming
 export class LLMService {
   private onProgress?: (step: ProcessingStep) => void;
   private metrics: PerformanceMetrics[] = [];
@@ -56,11 +55,9 @@ export class LLMService {
     const processingSteps: ProcessingStep[] = [];
     
     try {
-      // Step 1: Analyzing
       const step1 = { step: 'analyzing' as const, message: 'Initializing AI analysis...', progress: 10 };
       this.emit(step1);
       
-      // Step 2: Classifying with real streaming
       const step2 = { step: 'classifying' as const, message: 'Streaming response from OpenAI...', progress: 30 };
       this.emit(step2);
       
@@ -88,7 +85,6 @@ export class LLMService {
         });
       });
       
-      // Step 3: Processing stream
       const step3 = { step: 'generating' as const, message: 'Processing streaming response...', progress: 50 };
       this.emit(step3);
       
@@ -106,7 +102,6 @@ export class LLMService {
         }
       }
       
-      // Step 4: Validating
       const step4 = { step: 'validating' as const, message: 'Validating structured output...', progress: 85 };
       this.emit(step4);
       
@@ -118,7 +113,6 @@ export class LLMService {
           throw new ValidationError("Invalid response format", parsed.error);
         }
         
-        // Step 5: Complete
         const step5 = {
           step: 'complete' as const,
           message: 'Processing complete!',
@@ -129,7 +123,6 @@ export class LLMService {
         
         const processingTime = Date.now() - startTime;
         
-        // Record metrics
         this.recordMetrics({
           method: 'response_format',
           processingTime,
@@ -150,7 +143,6 @@ export class LLMService {
       }
       
     } catch (error) {
-      // Record failed metrics
       this.recordMetrics({
         method: 'response_format',
         processingTime: Date.now() - startTime,
@@ -171,11 +163,9 @@ export class LLMService {
     const processingSteps: ProcessingStep[] = [];
     
     try {
-      // Step 1: Analyzing
       const step1 = { step: 'analyzing' as const, message: 'Preparing tool call...', progress: 15 };
       this.emit(step1);
       
-      // Step 2: Tool invocation with streaming
       const step2 = { step: 'classifying' as const, message: 'Invoking classification tool...', progress: 35 };
       this.emit(step2);
       
@@ -200,7 +190,6 @@ export class LLMService {
         });
       });
       
-      // Step 3: Processing tool stream
       const step3 = { step: 'generating' as const, message: 'Processing tool response stream...', progress: 55 };
       this.emit(step3);
       
@@ -221,7 +210,6 @@ export class LLMService {
         }
       }
       
-      // Step 4: Validating
       const step4 = { step: 'validating' as const, message: 'Validating tool output...', progress: 85 };
       this.emit(step4);
       
@@ -237,7 +225,6 @@ export class LLMService {
           throw new ValidationError("Invalid tool response", parsed.error);
         }
         
-        // Step 5: Complete
         const step5 = {
           step: 'complete' as const,
           message: 'Tool processing complete!',
@@ -248,7 +235,6 @@ export class LLMService {
         
         const processingTime = Date.now() - startTime;
         
-        // Record metrics
         this.recordMetrics({
           method: 'tool_call',
           processingTime,
@@ -258,7 +244,7 @@ export class LLMService {
         
         return {
           result: parsed.data as Support,
-          processingSteps: [], // Steps are streamed
+          processingSteps: [],
           method: 'tool_call',
           processingTime,
           confidence: parsed.data.confidence
@@ -269,7 +255,6 @@ export class LLMService {
       }
       
     } catch (error) {
-      // Record failed metrics
       this.recordMetrics({
         method: 'tool_call',
         processingTime: Date.now() - startTime,
@@ -285,7 +270,6 @@ export class LLMService {
     }
   }
   
-  // Unstructured processing - regular chat completion without schema
   async processUnstructured(text: string): Promise<{
     rawOutput: string;
     processingTime: number;
@@ -294,10 +278,8 @@ export class LLMService {
     const startTime = Date.now();
     
     try {
-      // Step 1: Analyzing
       this.emit({ step: 'analyzing', message: 'Starting unstructured analysis...', progress: 20 });
       
-      // Step 2: Processing without schema
       this.emit({ step: 'classifying', message: 'Processing without structure constraints...', progress: 60 });
       
       const completion = await withRetry(async () => {
@@ -319,7 +301,6 @@ export class LLMService {
       const processingTime = Date.now() - startTime;
       const rawOutput = completion.choices[0]?.message?.content || '';
       
-      // Identify common issues with unstructured responses
       const errors: string[] = [];
       if (!rawOutput.toLowerCase().includes('sentiment')) {
         errors.push('Sentiment analysis missing or unclear');
@@ -351,7 +332,6 @@ export class LLMService {
     }
   }
   
-  // Comparison method for structured vs unstructured
   public async compareStructuredVsUnstructured(text: string): Promise<{
     structured: {
       data: Support;
@@ -395,7 +375,6 @@ export class LLMService {
     };
   }
   
-  // Utility for comparison metrics
   public async compareMethodsParallel(text: string): Promise<{
     responseFormat: LLMResult;
     toolCall: LLMResult;

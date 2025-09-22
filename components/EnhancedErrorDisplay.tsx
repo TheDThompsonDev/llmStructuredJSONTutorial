@@ -27,7 +27,6 @@ export default function EnhancedErrorDisplay({
     try {
       await navigator.clipboard.writeText(error);
       setCopied(true);
-      // Reset copy state immediately for better responsiveness
       setCopied(false);
     } catch (err) {
       console.error('Failed to copy error:', err);
@@ -61,7 +60,7 @@ export default function EnhancedErrorDisplay({
   };
 
   const getRetryDelay = (attempt: number) => {
-    return Math.min(1000 * Math.pow(2, attempt - 1), 30000); // Exponential backoff, max 30s
+    return Math.min(1000 * Math.pow(2, attempt - 1), 30000);
   };
 
   const errorType = getErrorType(error);
@@ -76,7 +75,6 @@ export default function EnhancedErrorDisplay({
     >
       <div className="glass-effect rounded-2xl p-6 border border-red-200 bg-gradient-to-r from-red-50 to-orange-50">
         <div className="space-y-4">
-          {/* Header */}
           <div className="flex items-start gap-3">
             <div className="text-2xl">{errorIcon}</div>
             <div className="flex-1">
@@ -95,7 +93,6 @@ export default function EnhancedErrorDisplay({
             </div>
           </div>
 
-          {/* Error Details & Suggestions */}
           <div className="bg-white bg-opacity-50 rounded-lg p-4">
             <h4 className="font-semibold text-gray-800 mb-2">Possible Solutions:</h4>
             <ul className="text-sm text-gray-700 space-y-1">
@@ -144,7 +141,6 @@ export default function EnhancedErrorDisplay({
             </ul>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center gap-3">
             {retryable && onRetry && (
               <button
@@ -191,7 +187,6 @@ export default function EnhancedErrorDisplay({
             </button>
           </div>
 
-          {/* Retry Information */}
           {attemptCount > 1 && (
             <div className="text-xs text-gray-600 bg-gray-100 rounded-lg p-3">
               <strong>Retry Strategy:</strong> Using exponential backoff. 

@@ -49,16 +49,15 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
     const file = event.target.files?.[0];
     if (file && file.type === 'text/csv') {
       setUploadedFile(file);
-      // Parse CSV (simplified - in real app would use proper CSV parser)
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target?.result as string;
         const lines = text.split('\n').filter(line => line.trim());
-        const messages = lines.slice(1); // Skip header
+        const messages = lines.slice(1);
         
         const batch: BatchResult[] = messages.map((message, index) => ({
           id: `batch-${index + 1}`,
-          message: message.replace(/[",]/g, ''), // Simple cleanup
+          message: message.replace(/[",]/g, ''),
           status: 'pending' as const
         }));
         
@@ -84,24 +83,20 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
     setIsProcessing(true);
     setIsPaused(false);
     
-    const delay = 0; // Remove artificial delays
+    const delay = 0;
     
     for (let i = currentIndex; i < batchData.length; i++) {
       if (isPaused) break;
       
       setCurrentIndex(i);
       
-      // Update status to processing
-      setBatchData(prev => prev.map((item, index) => 
+      setBatchData(prev => prev.map((item, index) =>
         index === i ? { ...item, status: 'processing' as const } : item
       ));
       
       try {
-        // Process immediately without delay
-        
         if (isPaused) break;
         
-        // Mock result generation
         const mockResult = generateMockResult(batchData[i].message);
         
         setBatchData(prev => prev.map((item, index) => 
@@ -135,7 +130,6 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
     const departments = ['customer_support', 'online_ordering', 'product_quality', 'shipping_and_delivery', 'other_off_topic'];
     const priorities: Array<'low' | 'medium' | 'high'> = ['low', 'medium', 'high'];
     
-    // Smart classification based on keywords
     let sentiment: 'positive' | 'neutral' | 'negative' = 'neutral';
     let department = 'customer_support';
     
@@ -160,10 +154,10 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
         sentiment,
         department,
         reply: `Thank you for your message. We'll address your ${sentiment === 'negative' ? 'concern' : 'inquiry'} promptly.`,
-        confidence: Math.random() * 0.3 + 0.7, // 70-100%
+        confidence: Math.random() * 0.3 + 0.7,
         priority: priorities[Math.floor(Math.random() * priorities.length)]
       },
-      processingTime: Math.floor(Math.random() * 2000) + 500 // 500-2500ms
+      processingTime: Math.floor(Math.random() * 2000) + 500
     };
   };
 
@@ -215,7 +209,6 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      {/* Header */}
       <div className="glass-effect rounded-2xl p-6">
         <div className="text-center space-y-4">
           <h3 className="text-2xl font-bold gradient-text flex items-center justify-center gap-2">
@@ -229,9 +222,7 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
         </div>
       </div>
 
-      {/* Controls */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upload Section */}
         <div className="glass-effect rounded-2xl p-6">
           <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <Upload className="w-6 h-6 text-blue-600" />
@@ -277,7 +268,6 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
           </div>
         </div>
 
-        {/* Processing Controls */}
         <div className="glass-effect rounded-2xl p-6">
           <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <Play className="w-6 h-6 text-green-600" />
@@ -339,7 +329,6 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
         </div>
       </div>
 
-      {/* Progress Overview */}
       {batchData.length > 0 && (
         <div className="glass-effect rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
@@ -350,7 +339,6 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
           </div>
           
           <div className="space-y-4">
-            {/* Progress Bar */}
             <div className="w-full bg-gray-200 rounded-full h-3">
               <motion.div
                 className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full"
@@ -360,7 +348,6 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
               />
             </div>
             
-            {/* Statistics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-800">{batchData.length}</div>
@@ -383,7 +370,6 @@ export default function BatchProcessor({ onBatchComplete }: BatchProcessorProps)
         </div>
       )}
 
-      {/* Results Table */}
       {batchData.length > 0 && (
         <div className="glass-effect rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">

@@ -1,5 +1,5 @@
-import { classifyRF } from "./response-format.js";
-import { classifyTool } from "./tool-strict.js";
+import { classifyRF } from "./response-format";
+import { classifyTool } from "./tool-strict";
 
 async function run() {
   const rf = await classifyRF("It's been weeks and no order.");

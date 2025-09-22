@@ -141,7 +141,6 @@ const DEPARTMENT_CONFIGS = {
   }
 } as const;
 
-// Mock ticket data generator
 const generateMockTickets = (department: string, count: number = 5) => {
   const tickets = [];
   const config = DEPARTMENT_CONFIGS[department as keyof typeof DEPARTMENT_CONFIGS];
@@ -156,7 +155,7 @@ const generateMockTickets = (department: string, count: number = 5) => {
       message: config?.commonIssues[Math.floor(Math.random() * config.commonIssues.length)] || 'General inquiry',
       sentiment: sentiments[Math.floor(Math.random() * sentiments.length)],
       priority: priorities[Math.floor(Math.random() * priorities.length)],
-      timestamp: new Date(Date.now() - Math.random() * 86400000), // Random time in last 24h
+      timestamp: new Date(Date.now() - Math.random() * 86400000),
       status: statuses[Math.floor(Math.random() * statuses.length)]
     });
   }
@@ -227,7 +226,6 @@ export default function DepartmentDetailModal({
           exit={{ scale: 0.9, opacity: 0 }}
           className="w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-2xl"
         >
-          {/* Header */}
           <div className={`${config.bgColor} border-b ${config.borderColor} p-6`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -248,7 +246,6 @@ export default function DepartmentDetailModal({
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="border-b border-gray-200">
             <div className="flex space-x-8 px-6">
               {[
@@ -272,11 +269,9 @@ export default function DepartmentDetailModal({
             </div>
           </div>
 
-          {/* Content */}
           <div className="p-6 overflow-y-auto max-h-[60vh]">
             {selectedTab === 'overview' && (
               <div className="space-y-6">
-                {/* Key Metrics */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gray-50 rounded-lg p-4">
                     <div className="text-2xl font-bold text-gray-800">{config.teamSize}</div>
@@ -296,7 +291,6 @@ export default function DepartmentDetailModal({
                   </div>
                 </div>
 
-                {/* Common Issues */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Common Issues</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">

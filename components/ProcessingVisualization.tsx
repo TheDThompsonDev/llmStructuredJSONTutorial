@@ -74,14 +74,12 @@ export default function ProcessingVisualization({
   useEffect(() => {
     if (allSteps.length > displayedSteps.length) {
       const newSteps = allSteps.slice(displayedSteps.length);
-      // Display all steps immediately
       setDisplayedSteps(newSteps);
     }
   }, [allSteps, displayedSteps.length]);
 
   useEffect(() => {
     if (currentStep?.step === 'complete' && currentStep.data) {
-      // Simulate streaming JSON output
       const json = JSON.stringify(currentStep.data, null, 2);
       let currentIndex = 0;
       setJsonOutput('');
@@ -126,7 +124,6 @@ export default function ProcessingVisualization({
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      {/* Method Indicator */}
       {method && (
         <div className="glass-effect rounded-xl p-4 text-center">
           <div className="flex items-center justify-center gap-2">
@@ -138,7 +135,6 @@ export default function ProcessingVisualization({
         </div>
       )}
 
-      {/* Processing Steps */}
       <div className="glass-effect rounded-2xl p-6">
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
@@ -197,7 +193,6 @@ export default function ProcessingVisualization({
         </div>
       </div>
 
-      {/* JSON Output Visualization */}
       {jsonOutput && (
         <div className="glass-effect rounded-2xl p-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">

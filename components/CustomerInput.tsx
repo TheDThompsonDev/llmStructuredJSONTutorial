@@ -38,7 +38,6 @@ export default function CustomerInput({ onSubmit, isProcessing }: CustomerInputP
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="glass-effect rounded-2xl p-6 space-y-6">
-        {/* Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 text-2xl font-bold gradient-text">
             <MessageCircle className="w-8 h-8 text-blue-600" />
@@ -49,7 +48,6 @@ export default function CustomerInput({ onSubmit, isProcessing }: CustomerInputP
           </p>
         </div>
 
-        {/* Method Selection */}
         <div className="space-y-3">
           <label className="block text-sm font-semibold text-gray-700">
             Processing Method
@@ -94,7 +92,6 @@ export default function CustomerInput({ onSubmit, isProcessing }: CustomerInputP
           </div>
         </div>
 
-        {/* Message Input */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
@@ -129,7 +126,6 @@ export default function CustomerInput({ onSubmit, isProcessing }: CustomerInputP
           </button>
         </form>
 
-        {/* Example Messages */}
         <div className="space-y-3">
           <label className="block text-sm font-semibold text-gray-700">
             Or try these examples:

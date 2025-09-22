@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { openai, MODEL, withRetry } from '../../../src/lib/openai';
-import { SupportZod, SupportJSONSchema, type Support } from '../../../src/lib/schemas';
+import { SupportZod, SupportJSONSchema, safeJson, type Support } from '../../../src/lib/schemas';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +23,6 @@ async function processStructured(
   const startTime = Date.now();
   
   try {
-    // Step 1: Parsing
     writer.write(encode({
       status: 'parsing',
       progress: 20,
@@ -33,7 +32,6 @@ async function processStructured(
     }));
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Step 2: LLM Analysis
     writer.write(encode({
       status: 'analyzing',
       progress: 40,
@@ -43,7 +41,6 @@ async function processStructured(
     }));
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    // Step 3: Schema Application
     writer.write(encode({
       status: 'structuring',
       progress: 60,
@@ -72,7 +69,6 @@ async function processStructured(
       });
     });
 
-    // Step 4: Validation
     writer.write(encode({
       status: 'validating',
       progress: 80,
@@ -87,14 +83,16 @@ async function processStructured(
       throw new Error('No content received from OpenAI');
     }
 
-    const parsed = JSON.parse(content);
-    const validated = SupportZod.safeParse(parsed);
+    const jsonResult = safeJson(content);
+    if (!jsonResult.ok) {
+      throw new Error(`Invalid JSON response from LLM: ${jsonResult.error}`);
+    }
     
+    const validated = SupportZod.safeParse(jsonResult.data);
     if (!validated.success) {
-      throw new Error('Schema validation failed');
+      throw new Error(`Schema validation failed: ${validated.error.issues.map(i => i.message).join(', ')}`);
     }
 
-    // Step 5: Complete
     writer.write(encode({
       status: 'complete',
       progress: 100,
@@ -119,7 +117,6 @@ async function processStructured(
       type: 'structured'
     }));
 
-    // Return fallback structured data to demonstrate the difference
     return {
       data: {
         sentiment: 'negative',
@@ -129,7 +126,7 @@ async function processStructured(
         reply: 'I apologize for the inconvenience. I will investigate this issue and provide you with an update shortly.'
       },
       processingTime: Date.now() - startTime,
-      success: true // Still successful for demo purposes
+      success: true
     };
   }
 }
@@ -141,7 +138,6 @@ async function processUnstructured(
   const startTime = Date.now();
   
   try {
-    // Step 1: Parsing
     writer.write(encode({
       status: 'parsing',
       progress: 20,
@@ -151,7 +147,6 @@ async function processUnstructured(
     }));
     await new Promise(resolve => setTimeout(resolve, 600));
 
-    // Step 2: LLM Analysis
     writer.write(encode({
       status: 'analyzing',
       progress: 40,
@@ -161,7 +156,6 @@ async function processUnstructured(
     }));
     await new Promise(resolve => setTimeout(resolve, 400));
 
-    // Step 3: Text Processing
     writer.write(encode({
       status: 'structuring',
       progress: 60,
@@ -183,7 +177,6 @@ async function processUnstructured(
       });
     });
 
-    // Step 4: Formatting
     writer.write(encode({
       status: 'validating',
       progress: 80,
@@ -195,7 +188,6 @@ async function processUnstructured(
 
     const rawOutput = completion.choices[0]?.message?.content || '';
     
-    // Analyze the unstructured response for common issues
     const errors: string[] = [];
     const lowerOutput = rawOutput.toLowerCase();
     
@@ -215,7 +207,6 @@ async function processUnstructured(
       errors.push('Suggested response format unclear');
     }
 
-    // Step 5: Complete
     writer.write(encode({
       status: 'complete',
       progress: 100,
@@ -261,7 +252,6 @@ export async function POST(request: NextRequest) {
 
     (async () => {
       try {
-        // Process both structured and unstructured simultaneously
         const [structuredResult, unstructuredResult] = await Promise.all([
           processStructured(message, writer),
           processUnstructured(message, writer)

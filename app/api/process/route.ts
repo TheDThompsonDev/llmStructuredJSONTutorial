@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const MODEL = "gpt-4o-2024-08-06";
+import { openai, MODEL } from '../../../src/lib/openai';
+import { SupportJSONSchema, SupportZod, safeJson, ApiError, ApiSuccess } from '../../../src/lib/schemas';
 
 const SYSTEM_PROMPT = `You are an expert customer service AI system designed for enterprise-level customer support automation.
 
@@ -56,38 +51,7 @@ Please analyze this message and provide the structured classification and respon
         type: "json_schema",
         json_schema: {
           name: "customer_message_analysis",
-          schema: {
-            type: "object",
-            properties: {
-              sentiment: {
-                type: "string",
-                enum: ["positive", "negative", "neutral"],
-                description: "Overall sentiment of the message"
-              },
-              priority: {
-                type: "string",
-                enum: ["low", "medium", "high"],
-                description: "Urgency level of the customer request"
-              },
-              department: {
-                type: "string",
-                enum: ["customer_support", "online_ordering", "product_quality", "shipping_and_delivery", "other_off_topic"],
-                description: "Most appropriate department to handle this request"
-              },
-              confidence: {
-                type: "number",
-                minimum: 0,
-                maximum: 1,
-                description: "Confidence level in the analysis (0-1)"
-              },
-              reply: {
-                type: "string",
-                description: "Professional suggested response to the customer"
-              }
-            },
-            required: ["sentiment", "priority", "department", "confidence", "reply"],
-            additionalProperties: false
-          }
+          schema: SupportJSONSchema
         }
       },
       temperature: 0.3
@@ -97,27 +61,53 @@ Please analyze this message and provide the structured classification and respon
     
     const content = completion.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('No response from OpenAI');
+      const errorResponse: ApiError = {
+        success: false,
+        error: 'No response from OpenAI',
+        details: 'OpenAI returned empty content'
+      };
+      return NextResponse.json(errorResponse, { status: 500 });
     }
 
+    const jsonResult = safeJson(content);
+    if (!jsonResult.ok) {
+      const errorResponse: ApiError = {
+        success: false,
+        error: 'Invalid JSON response from LLM',
+        details: jsonResult.error
+      };
+      return NextResponse.json(errorResponse, { status: 500 });
+    }
 
-    const parsedData = JSON.parse(content);
+    const validated = SupportZod.safeParse(jsonResult.data);
+    if (!validated.success) {
+      const errorResponse: ApiError = {
+        success: false,
+        error: 'Schema validation failed',
+        details: 'Response does not match expected schema',
+        issues: validated.error.issues.map(issue => ({
+          path: issue.path,
+          message: issue.message,
+          code: issue.code
+        }))
+      };
+      return NextResponse.json(errorResponse, { status: 422 });
+    }
 
-
-    return NextResponse.json({
-      data: parsedData,
-      processingTime,
-      success: true
-    });
+    const successResponse: ApiSuccess = {
+      success: true,
+      data: validated.data,
+      processingTime
+    };
+    return NextResponse.json(successResponse);
 
   } catch (error) {
     console.error('Processing error:', error);
-    return NextResponse.json(
-      { 
-        error: 'Failed to process message',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }, 
-      { status: 500 }
-    );
+    const errorResponse: ApiError = {
+      success: false,
+      error: 'Failed to process message',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    };
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }

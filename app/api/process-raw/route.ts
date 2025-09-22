@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { openai, MODEL } from '../../../src/lib/openai';
+import { ApiError, ApiSuccess, safeJson } from '../../../src/lib/schemas';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const SYSTEM_PROMPT = `You are a helpful customer service AI. Provide a polite and empathetic response to the customer's message.
 
-const MODEL = "gpt-4o-2024-08-06";
+Analyze the message and determine the sentiment, department, and priority.
 
-const SYSTEM_PROMPT = 'Be helpful and concise to our customer. A customer is coming to you with a problem that we need to respond to. Can you create the response to their input message.';
+Wrap the final customer-ready message in [REPLY]...[/REPLY] tags. Do not add other content inside the tags.`;
 
 
 export async function POST(request: NextRequest) {
@@ -15,7 +14,11 @@ export async function POST(request: NextRequest) {
     const { message } = await request.json();
 
     if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+      const errorResponse: ApiError = {
+        success: false,
+        error: 'Message is required'
+      };
+      return NextResponse.json(errorResponse, { status: 400 });
     }
 
 
@@ -30,7 +33,7 @@ export async function POST(request: NextRequest) {
         },
         {
           role: "user",
-          content: `Analyze this customer message and suggest fields {sentiment, department, priority, reply}:\n${message}`
+          content: `Customer message: "${message}"`
         }
       ],
       temperature: 0.7,
@@ -43,24 +46,30 @@ export async function POST(request: NextRequest) {
     
     
     if (!rawOutput) {
-      throw new Error('No response from OpenAI');
+      const errorResponse: ApiError = {
+        success: false,
+        error: 'No response from OpenAI',
+        details: 'OpenAI returned empty content'
+      };
+      return NextResponse.json(errorResponse, { status: 500 });
     }
 
-
-    return NextResponse.json({
-      rawOutput,
-      processingTime,
-      success: true
-    });
+    const successResponse: ApiSuccess = {
+      success: true,
+      data: {
+        rawOutput: rawOutput
+      },
+      processingTime
+    };
+    return NextResponse.json(successResponse);
 
   } catch (error) {
     console.error('Processing error:', error);
-    return NextResponse.json(
-      { 
-        error: 'Failed to process message',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }, 
-      { status: 500 }
-    );
+    const errorResponse: ApiError = {
+      success: false,
+      error: 'Failed to process message',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    };
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }

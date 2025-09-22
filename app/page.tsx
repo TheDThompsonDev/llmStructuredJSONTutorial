@@ -80,7 +80,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-sage-gradient">
-      {/* Header */}
       <header className="glass border-b border-teal-400/20">
         <div className="container-sage py-4">
           <div className="flex items-center justify-between">
@@ -111,7 +110,6 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="py-20">
         <div className="container-sage">
           <div className="text-center mb-16">
@@ -138,7 +136,6 @@ export default function HomePage() {
             </motion.div>
           </div>
 
-          {/* Processing Visualization */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -199,14 +196,12 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          {/* Interactive Demo Section */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             className="grid lg:grid-cols-2 gap-12 mb-20"
           >
-            {/* Input Section */}
             <div className="glass rounded-3xl p-8 hover-lift">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 bg-sky-gradient rounded-xl flex items-center justify-center">
@@ -250,7 +245,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Results Preview */}
             <div className="glass rounded-3xl p-8 hover-lift">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 bg-teal-gradient rounded-xl flex items-center justify-center">
@@ -294,63 +288,6 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          {/* Comparison Benefits */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-4xl font-bold text-sage-primary mb-12">
-              Why Structured Processing Wins
-            </h2>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="glass rounded-2xl p-8 hover-lift">
-                <div className="w-16 h-16 bg-emerald-gradient rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Target className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-sage-primary mb-4">87% More Accurate</h3>
-                <p className="text-sage-secondary">
-                  Schema validation ensures consistent, reliable data extraction every time
-                </p>
-                <div className="mt-6 flex items-center justify-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-emerald-600" />
-                  <span className="text-sm font-medium text-emerald-700">Validated Structure</span>
-                </div>
-              </div>
-
-              <div className="glass rounded-2xl p-8 hover-lift">
-                <div className="w-16 h-16 bg-teal-gradient rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Clock className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-sage-primary mb-4">3x Faster Processing</h3>
-                <p className="text-sage-secondary">
-                  No manual parsing required - data flows directly into your systems
-                </p>
-                <div className="mt-6 flex items-center justify-center gap-2">
-                  <Zap className="w-5 h-5 text-teal-400" />
-                  <span className="text-sm font-medium text-teal-600">Automated Pipeline</span>
-                </div>
-              </div>
-
-              <div className="glass rounded-2xl p-8 hover-lift">
-                <div className="w-16 h-16 bg-sage-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <TrendingUp className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-sage-primary mb-4">Zero Errors</h3>
-                <p className="text-sage-secondary">
-                  Type safety and validation eliminate data corruption and processing failures
-                </p>
-                <div className="mt-6 flex items-center justify-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-emerald-600" />
-                  <span className="text-sm font-medium text-emerald-700">Bulletproof Reliability</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* CTA Section */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}

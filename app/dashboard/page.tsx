@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   ArrowLeft,
   MessageSquare,
   BrainCircuit,
@@ -31,9 +31,15 @@ import {
   Timer,
   Smile,
   BarChart3,
-  Settings
+  Settings,
+  ToggleLeft,
+  ToggleRight,
+  Search,
+  Code,
+  Wrench
 } from 'lucide-react';
 import Link from 'next/link';
+import { parseManually, parseWithRegex, ParsedResult, DEPARTMENTS } from '../../src/lib/schemas';
 
 interface ProcessingState {
   status: 'idle' | 'parsing' | 'analyzing' | 'structuring' | 'validating' | 'complete' | 'error';
@@ -98,12 +104,15 @@ const DashboardContent = () => {
   const [results, setResults] = useState<ProcessingResult | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [processingMode, setProcessingMode] = useState<'structured' | 'unstructured'>('structured');
+  const [showManualParsing, setShowManualParsing] = useState(false);
+  const [showRegexParsing, setShowRegexParsing] = useState(false);
+  const [manualParseResult, setManualParseResult] = useState<ParsedResult | null>(null);
+  const [regexParseResult, setRegexParseResult] = useState<ParsedResult | null>(null);
   
-  // Real-time ROI Metrics State - Starting from zero, building actual usage
   const [roiMetrics, setRoiMetrics] = useState<ROIMetrics>({
     messagesProcessed: 0,
     timesSavedHours: 0,
-    employeeSatisfaction: 75, // Baseline employee satisfaction before AI
+    employeeSatisfaction: 75,
     accuracyImprovement: 0,
     costSavings: 0,
     negativeInteractionsBlocked: 0,
@@ -160,28 +169,21 @@ const DashboardContent = () => {
     }
   }, [isProcessing, structuredState.progress, unstructuredState.progress]);
 
-  // Update ROI metrics based on actual message processing with transparent calculations
   const updateROIMetrics = (messageData: StructuredResult, aiProcessingTime: number) => {
     setRoiMetrics(prev => {
       const newMessagesProcessed = prev.messagesProcessed + 1;
       
-      // Transparent time calculation:
-      // AI processes in ~2-3 seconds, human manual triage takes 3-5 minutes (average 4 minutes = 240 seconds)
-      const humanTriageTimeSeconds = 240; // 4 minutes for manual sentiment analysis, department routing, and response
-      const aiProcessingTimeSeconds = aiProcessingTime / 1000; // Convert ms to seconds
+      const humanTriageTimeSeconds = 240;
+      const aiProcessingTimeSeconds = aiProcessingTime / 1000;
       const timesSavedSeconds = Math.max(0, humanTriageTimeSeconds - aiProcessingTimeSeconds);
-      const timesSavedHours = timesSavedSeconds / 3600; // Convert to hours
+      const timesSavedHours = timesSavedSeconds / 3600;
       
-      // Transparent cost calculation:
-      // Average customer service rep salary: $18/hour (industry standard)
       const costPerHourHuman = 18;
       const costSavingsPerMessage = timesSavedHours * costPerHourHuman;
       
-      // Employee satisfaction: Only improves when negative interactions are auto-handled
       const negativeBlocked = messageData.sentiment === 'negative' ? 1 : 0;
-      const satisfactionImprovement = negativeBlocked * 0.5; // 0.5% per negative interaction blocked
+      const satisfactionImprovement = negativeBlocked * 0.5;
       
-      // Department routing accuracy: Based on AI confidence
       const routingAccuracy = messageData.confidence;
       const cumulativeAccuracy = ((prev.departmentRoutingAccuracy * prev.messagesProcessed) + routingAccuracy) / newMessagesProcessed;
       
@@ -189,7 +191,7 @@ const DashboardContent = () => {
         messagesProcessed: newMessagesProcessed,
         timesSavedHours: prev.timesSavedHours + timesSavedHours,
         employeeSatisfaction: Math.min(100, prev.employeeSatisfaction + satisfactionImprovement),
-        accuracyImprovement: ((aiProcessingTimeSeconds / humanTriageTimeSeconds) * 100), // % improvement in speed
+        accuracyImprovement: ((aiProcessingTimeSeconds / humanTriageTimeSeconds) * 100),
         costSavings: prev.costSavings + costSavingsPerMessage,
         negativeInteractionsBlocked: prev.negativeInteractionsBlocked + negativeBlocked,
         averageResponseTime: aiProcessingTimeSeconds,
@@ -214,7 +216,6 @@ const DashboardContent = () => {
       setUnstructuredState({ status: 'idle', progress: 0, details: 'Starting unstructured processing...', stage: 'Initializing' });
     }
 
-    // Simulate processing stages
     const simulateProcessingStages = async (isStructured: boolean) => {
       const stages = [
         { stage: 'Input Analysis', progress: 25, details: 'Parsing customer message and extracting key information' },
@@ -260,7 +261,6 @@ const DashboardContent = () => {
     };
 
     try {
-      // Start processing stages simulation
       if (processingMode === 'structured') {
         simulateProcessingStages(true);
       } else {
@@ -274,19 +274,26 @@ const DashboardContent = () => {
         body: JSON.stringify({ message })
       });
 
-      if (!response.ok) {
-        throw new Error('Processing failed');
+      const apiResponse = await response.json();
+      
+      if (!response.ok || !apiResponse.success) {
+        const errorMsg = apiResponse.error || 'Processing failed';
+        const details = apiResponse.issues?.map((issue: any) =>
+          `${issue.path.join('.')}: ${issue.message}`
+        ).join(', ') || apiResponse.details;
+        throw new Error(`${errorMsg}${details ? ': ' + details : ''}`);
       }
 
       let result;
       if (processingMode === 'structured') {
-        result = await response.json();
-      } else {
-        // Raw endpoint returns JSON with rawOutput and processingTime
-        const rawResponse = await response.json();
         result = {
-          rawOutput: rawResponse.rawOutput,
-          processingTime: rawResponse.processingTime,
+          data: apiResponse.data,
+          processingTime: apiResponse.processingTime
+        };
+      } else {
+        result = {
+          rawOutput: apiResponse.data.rawOutput,
+          processingTime: apiResponse.processingTime,
           errors: [
             'No structured data fields detected - manual extraction required',
             'Response requires manual parsing and interpretation',
@@ -308,7 +315,6 @@ const DashboardContent = () => {
         });
         setStructuredState({ status: 'complete', progress: 100, details: 'Processing complete', stage: 'Complete' });
         
-        // Update ROI metrics based on the processed message
         updateROIMetrics(result.data, result.processingTime);
       } else {
         setResults({
@@ -360,9 +366,32 @@ const DashboardContent = () => {
     setUnstructuredState({ status: 'idle', progress: 0, details: 'Ready to process', stage: 'Waiting' });
   };
 
+  const handleManualParsingToggle = () => {
+    const newValue = !showManualParsing;
+    setShowManualParsing(newValue);
+    
+    if (newValue && results?.unstructured?.data?.rawOutput) {
+      const parsed = parseManually(results.unstructured.data.rawOutput);
+      setManualParseResult(parsed);
+    } else {
+      setManualParseResult(null);
+    }
+  };
+
+  const handleRegexParsingToggle = () => {
+    const newValue = !showRegexParsing;
+    setShowRegexParsing(newValue);
+    
+    if (newValue && results?.unstructured?.data?.rawOutput) {
+      const parsed = parseWithRegex(results.unstructured.data.rawOutput);
+      setRegexParseResult(parsed);
+    } else {
+      setRegexParseResult(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-sage-gradient">
-      {/* Header */}
       <header className="glass border-b border-teal-400/20">
         <div className="container-sage py-4">
           <div className="flex items-center justify-between">
@@ -410,7 +439,6 @@ const DashboardContent = () => {
       </header>
 
       <div className="container-sage py-8 space-y-8">
-        {/* Real-Time ROI Dashboard */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -561,7 +589,6 @@ const DashboardContent = () => {
           </div>
         </motion.div>
 
-        {/* Message Input */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -578,7 +605,6 @@ const DashboardContent = () => {
           </div>
           
           <div className="space-y-6">
-            {/* Processing Mode Toggle */}
             <div className="flex items-center justify-center">
               <div className="flex bg-white/50 rounded-xl p-1 border border-sage-700/20">
                 <button
@@ -639,7 +665,6 @@ const DashboardContent = () => {
           </div>
         </motion.div>
 
-        {/* Processing Pipeline Visualization */}
         {(isProcessing || results) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -726,7 +751,6 @@ const DashboardContent = () => {
           </motion.div>
         )}
 
-        {/* Processing Results */}
         {(isProcessing || results) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -904,61 +928,146 @@ const DashboardContent = () => {
                           {results.unstructured.data.rawOutput}
                         </div>
                         
-                        <div className="mt-4">
-                          <div className="text-sm text-sage-secondary mb-2 font-medium">Developer Parsing Challenge:</div>
-                          <div className="bg-gray-900 p-4 rounded-xl text-xs text-green-400 font-mono max-h-80 overflow-auto">
-                            <pre className="text-yellow-300">{`// Real parsing code developers need to write:
-`}</pre>
-                            <pre className="text-white">{`function parseUnstructuredResponse(text) {
-  const result = {};
-  
-  // Try to extract sentiment - unreliable!
-  if (text.match(/happy|great|excellent|satisfied/i)) {
-    result.sentiment = 'positive';
-  } else if (text.match(/angry|terrible|awful|frustrated/i)) {
-    result.sentiment = 'negative';
-  } else {
-    result.sentiment = 'unknown'; // 😞 Often unclear
-  }
-  
-  // Try to determine priority - guesswork!
-  if (text.match(/urgent|asap|immediately|emergency/i)) {
-    result.priority = 'high';
-  } else if (text.match(/when you can|no rush|sometime/i)) {
-    result.priority = 'low';
-  } else {
-    result.priority = 'medium'; // 🤷‍♂️ Default guess
-  }
-  
-  // Department routing - very error-prone!
-  if (text.match(/order|purchase|buy|cart/i)) {
-    result.department = 'ordering';
-  } else if (text.match(/ship|deliver|track/i)) {
-    result.department = 'shipping';
-  } else {
-    result.department = 'general'; // ❌ Often wrong
-  }
-  
-  return result;
-}
-
-// Issues with this approach:
-// • Breaks on edge cases ("not happy" -> positive) 
-// • No confidence scoring
-// • Inconsistent across different response styles
-// • Requires constant rule updates
-// • High maintenance overhead`}</pre>
+                        <div className="mt-6 space-y-4">
+                          <div className="text-sm text-sage-secondary mb-3 font-medium">Parsing Challenges:</div>
+                          
+                          <div className="border border-gray-200 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <Wrench className="w-4 h-4 text-blue-600" />
+                                <span className="font-medium text-gray-800">Manual Parsing Attempt</span>
+                              </div>
+                              <button
+                                onClick={handleManualParsingToggle}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-50 hover:bg-blue-100 transition-colors"
+                              >
+                                {showManualParsing ? <ToggleRight className="w-4 h-4 text-blue-600" /> : <ToggleLeft className="w-4 h-4 text-gray-400" />}
+                                <span className="text-sm text-blue-700">{showManualParsing ? 'Hide' : 'Show'} Results</span>
+                              </button>
+                            </div>
+                            
+                            {showManualParsing && manualParseResult && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="space-y-3"
+                              >
+                                <div className="bg-blue-50 p-3 rounded-lg space-y-3">
+                                  <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                      <div className="font-medium text-gray-700">Sentiment:</div>
+                                      <div className="text-blue-700">{manualParseResult.sentiment || 'Unknown'}</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-medium text-gray-700">Priority:</div>
+                                      <div className="text-blue-700">{manualParseResult.priority || 'Unknown'}</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-medium text-gray-700">Department:</div>
+                                      <div className="text-blue-700">{DEPARTMENTS[manualParseResult.department as keyof typeof DEPARTMENTS]?.name || manualParseResult.department}</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-medium text-gray-700">Confidence:</div>
+                                      <div className="text-red-600 font-medium">{Math.round(manualParseResult.confidence * 100)}%</div>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div className="font-medium text-gray-700 mb-2">Extracted Reply:</div>
+                                    <div className="bg-white p-3 rounded border text-sm text-gray-800 leading-relaxed">
+                                      {manualParseResult.reply || 'No reply extracted'}
+                                    </div>
+                                  </div>
+                                </div>
+                                {manualParseResult.errors.length > 0 && (
+                                  <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded">
+                                    <div className="text-sm text-red-700">
+                                      <div className="font-medium mb-1">Parsing Issues:</div>
+                                      <ul className="space-y-1">
+                                        {manualParseResult.errors.map((error, idx) => (
+                                          <li key={idx} className="text-xs">• {error}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  </div>
+                                )}
+                              </motion.div>
+                            )}
                           </div>
-                        </div>
-                        
-                        <div className="mt-4">
-                          <div className="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-lg">
-                            <div className="flex items-start gap-3">
-                              <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                              <div>
-                                <div className="font-semibold text-amber-800 mb-2">The Real Challenge</div>
-                                <div className="text-sm text-amber-700">
-                                  This natural language response would require manual parsing to extract structured data like sentiment, priority, and department routing. Developers would need to write complex regex patterns or use additional NLP processing to make this data actionable.
+
+                          <div className="border border-gray-200 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <Search className="w-4 h-4 text-purple-600" />
+                                <span className="font-medium text-gray-800">Regex Parsing Attempt</span>
+                              </div>
+                              <button
+                                onClick={handleRegexParsingToggle}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-50 hover:bg-purple-100 transition-colors"
+                              >
+                                {showRegexParsing ? <ToggleRight className="w-4 h-4 text-purple-600" /> : <ToggleLeft className="w-4 h-4 text-gray-400" />}
+                                <span className="text-sm text-purple-700">{showRegexParsing ? 'Hide' : 'Show'} Results</span>
+                              </button>
+                            </div>
+                            
+                            {showRegexParsing && regexParseResult && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="space-y-3"
+                              >
+                                <div className="bg-purple-50 p-3 rounded-lg space-y-3">
+                                  <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                      <div className="font-medium text-gray-700">Sentiment:</div>
+                                      <div className="text-purple-700">{regexParseResult.sentiment || 'Unknown'}</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-medium text-gray-700">Priority:</div>
+                                      <div className="text-purple-700">{regexParseResult.priority || 'Unknown'}</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-medium text-gray-700">Department:</div>
+                                      <div className="text-purple-700">{DEPARTMENTS[regexParseResult.department as keyof typeof DEPARTMENTS]?.name || regexParseResult.department}</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-medium text-gray-700">Confidence:</div>
+                                      <div className="text-red-600 font-medium">{Math.round(regexParseResult.confidence * 100)}%</div>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div className="font-medium text-gray-700 mb-2">Extracted Reply:</div>
+                                    <div className="bg-white p-3 rounded border text-sm text-gray-800 leading-relaxed">
+                                      {regexParseResult.reply || 'No reply extracted'}
+                                    </div>
+                                  </div>
+                                </div>
+                                {regexParseResult.errors.length > 0 && (
+                                  <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded">
+                                    <div className="text-sm text-red-700">
+                                      <div className="font-medium mb-1">Regex Limitations:</div>
+                                      <ul className="space-y-1">
+                                        {regexParseResult.errors.map((error, idx) => (
+                                          <li key={idx} className="text-xs">• {error}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  </div>
+                                )}
+                              </motion.div>
+                            )}
+                          </div>
+
+                          <div className="mt-4">
+                            <div className="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-lg">
+                              <div className="flex items-start gap-3">
+                                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <div className="font-semibold text-amber-800 mb-2">The Real Challenge</div>
+                                  <div className="text-sm text-amber-700">
+                                    Both manual parsing and regex approaches struggle with natural language responses. They're error-prone, brittle, and require constant maintenance. Compare this to the structured JSON approach which eliminates these parsing challenges entirely.
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -991,7 +1100,6 @@ const DashboardContent = () => {
           </motion.div>
         )}
 
-        {/* Processing Summary */}
         <AnimatePresence>
           {showComparison && (results?.structured || results?.unstructured) && (
             <motion.div

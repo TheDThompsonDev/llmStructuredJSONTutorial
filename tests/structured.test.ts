@@ -1,7 +1,6 @@
-// tests/structured.test.ts
 import { describe, it, expect } from "vitest";
-import { classifyRF } from "../src/response-format.js";
-import { classifyTool } from "../src/tool-strict.js";
+import { classifyRF } from "../src/response-format";
+import { classifyTool } from "../src/tool-strict";
 
 const hasKey = !!process.env.OPENAI_API_KEY;
 

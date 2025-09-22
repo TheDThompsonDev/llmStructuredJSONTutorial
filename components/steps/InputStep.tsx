@@ -56,7 +56,6 @@ export default function InputStep({ data, onComplete, onNext }: InputStepProps) 
     
     setIsProcessing(true);
     
-    // Store the message in the data context
     if (data) {
       data.message = message;
       data.timestamp = new Date().toISOString();
@@ -73,8 +72,7 @@ export default function InputStep({ data, onComplete, onNext }: InputStepProps) 
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Hero Section */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
@@ -92,8 +90,7 @@ export default function InputStep({ data, onComplete, onNext }: InputStepProps) 
         </p>
       </motion.div>
 
-      {/* Input Section */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -141,8 +138,7 @@ export default function InputStep({ data, onComplete, onNext }: InputStepProps) 
         </div>
       </motion.div>
 
-      {/* Example Messages */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -190,8 +186,7 @@ export default function InputStep({ data, onComplete, onNext }: InputStepProps) 
         </div>
       </motion.div>
 
-      {/* Features Preview */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}

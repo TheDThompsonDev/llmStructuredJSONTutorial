@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import OpenAI from "openai";
-import { SupportZod, SupportJSONSchema } from "./lib/schemas.js";
+import { SupportZod, SupportJSONSchema, safeJson } from "./lib/schemas";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-2024-08-06";
@@ -19,10 +19,17 @@ async function classifyRF(text: string) {
   });
 
   const raw = completion.choices[0].message.content ?? "";
-  // In structured mode, content is pure JSON
-  const obj = JSON.parse(raw);
-  const parsed = SupportZod.safeParse(obj);
-  if (!parsed.success) throw new Error(parsed.error.message);
+  
+  const jsonResult = safeJson(raw);
+  if (!jsonResult.ok) {
+    throw new Error(`Invalid JSON response from LLM: ${jsonResult.error}`);
+  }
+  
+  const parsed = SupportZod.safeParse(jsonResult.data);
+  if (!parsed.success) {
+    throw new Error(`Schema validation failed: ${parsed.error.issues.map(i => i.message).join(', ')}`);
+  }
+  
   return parsed.data;
 }
 

@@ -98,7 +98,6 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
       return;
     }
 
-    // Route immediately
     setRoutingStage('routing');
     setSelectedDepartment(result.department);
     setRoutingStage('complete');
@@ -106,11 +105,9 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
 
   const handleDepartmentClick = (departmentKey: string) => {
     if (routingStage === 'complete' && selectedDepartment === departmentKey) {
-      // Only allow clicking on the selected department when routing is complete
       setDetailModalDepartment(departmentKey);
       setDetailModalOpen(true);
     } else {
-      // For demo purposes, allow clicking on any department to see details
       setDetailModalDepartment(departmentKey);
       setDetailModalOpen(true);
     }
@@ -132,7 +129,6 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      {/* Routing Header */}
       <div className="glass-effect rounded-2xl p-6">
         <div className="text-center space-y-4">
           <h3 className="text-2xl font-bold gradient-text flex items-center justify-center gap-2">
@@ -171,7 +167,6 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
         </div>
       </div>
 
-      {/* Department Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <AnimatePresence>
           {Object.entries(DEPARTMENT_CONFIGS).map(([key, config]) => {
@@ -205,7 +200,6 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
                 }`}
                 onClick={() => handleDepartmentClick(key)}
               >
-                {/* Selection Animation */}
                 {isSelected && (
                   <motion.div
                     initial={{ width: 0 }}
@@ -216,7 +210,6 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
                 )}
                 
                 <div className="p-6 space-y-4">
-                  {/* Department Icon & Name */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-12 h-12 rounded-xl ${config.color} flex items-center justify-center`}>
@@ -242,12 +235,10 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
                     )}
                   </div>
                   
-                  {/* Description */}
                   <p className="text-gray-600 text-sm">
                     {config.description}
                   </p>
                   
-                  {/* Status Indicator */}
                   <div className="flex items-center justify-between">
                     <span className={`text-xs font-semibold ${
                       isSelected 
@@ -277,7 +268,6 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
         </AnimatePresence>
       </div>
 
-      {/* Generated Response */}
       {result && selectedDepartment && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -302,7 +292,6 @@ export default function DepartmentRouting({ result, isVisible }: DepartmentRouti
         </motion.div>
       )}
 
-      {/* Department Detail Modal */}
       <DepartmentDetailModal
         departmentKey={detailModalDepartment}
         isOpen={detailModalOpen}

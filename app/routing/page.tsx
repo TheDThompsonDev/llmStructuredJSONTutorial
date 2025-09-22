@@ -106,7 +106,6 @@ interface RoutingFlowNode {
   };
 }
 
-// Department configuration with UI properties
 const departmentConfig = {
   'technical': {
     icon: Code,
@@ -241,14 +240,12 @@ export default function MessageRoutingCenter() {
   
   const svgRef = useRef<SVGSVGElement>(null);
 
-  // Fetch real data from API
   const fetchRoutingData = async () => {
     try {
       const response = await fetch('/api/routing?type=overview');
       const data = await response.json();
       
       if (data.success) {
-        // Map API data to UI format
         const mappedDepartments = data.data.departments.map((dept: any) => ({
           ...dept,
           icon: departmentConfig[dept.id as keyof typeof departmentConfig]?.icon || Users,
@@ -267,7 +264,6 @@ export default function MessageRoutingCenter() {
     }
   };
 
-  // Fetch new messages periodically to simulate real-time updates
   const fetchNewMessages = async () => {
     try {
       const response = await fetch('/api/routing?type=messages&limit=5');
@@ -278,11 +274,9 @@ export default function MessageRoutingCenter() {
         
         setMessages(prev => [newMessage, ...prev.slice(0, 19)]);
         
-        // Animate routing flow
         setActiveFlow(['input', 'preprocess', 'sentiment', 'intent', 'classifier', newMessage.department]);
         setActiveFlow([]);
 
-        // Update stats
         const statsResponse = await fetch('/api/routing?type=stats');
         const statsData = await statsResponse.json();
         if (statsData.success) {
@@ -297,7 +291,6 @@ export default function MessageRoutingCenter() {
   useEffect(() => {
     fetchRoutingData();
     
-    // Set up real-time updates every 5 seconds
     const interval = setInterval(fetchNewMessages, 5000);
     
     return () => clearInterval(interval);
@@ -347,7 +340,6 @@ export default function MessageRoutingCenter() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sage-50 via-sky-50 to-sage-50 text-sage-700">
-      {/* Navigation */}
       <nav className="glass-nav border-b border-sage-700/20">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -381,7 +373,6 @@ export default function MessageRoutingCenter() {
       </nav>
 
       <div className="container mx-auto px-6 py-8">
-        {/* Routing Statistics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-purple-500/20 backdrop-blur-xl rounded-2xl p-6 border border-purple-500/30">
             <div className="flex items-center justify-between mb-2">
@@ -425,7 +416,6 @@ export default function MessageRoutingCenter() {
         </div>
 
         <div className="grid xl:grid-cols-3 gap-8">
-          {/* Routing Flow Visualization */}
           <div className="xl:col-span-2">
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 mb-8">
               <div className="flex items-center justify-between mb-6">
@@ -444,8 +434,7 @@ export default function MessageRoutingCenter() {
 
               <div className="bg-gray-900/50 rounded-xl p-6 overflow-x-auto">
                 <svg ref={svgRef} width="800" height="400" className="min-w-full">
-                  {/* Connections */}
-                  {routingFlowNodes.map(node => 
+                  {routingFlowNodes.map(node =>
                     node.connections.map(connectionId => {
                       const targetNode = routingFlowNodes.find(n => n.id === connectionId);
                       if (!targetNode) return null;
@@ -465,7 +454,6 @@ export default function MessageRoutingCenter() {
                     })
                   )}
 
-                  {/* Nodes */}
                   {routingFlowNodes.map(node => {
                     const isActive = activeFlow.includes(node.id);
                     return (
@@ -519,7 +507,6 @@ export default function MessageRoutingCenter() {
               </div>
             </div>
 
-            {/* Live Message Stream */}
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -625,9 +612,7 @@ export default function MessageRoutingCenter() {
             </div>
           </div>
 
-          {/* Department Analytics Sidebar */}
           <div className="space-y-6">
-            {/* Department Overview */}
             <div className="glass-card">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-sage-700">
                 <Users className="w-5 h-5 text-sage-700" />
@@ -689,7 +674,6 @@ export default function MessageRoutingCenter() {
               </div>
             </div>
 
-            {/* Real-time Metrics */}
             <div className="glass-card">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-sage-700">
                 <BarChart3 className="w-5 h-5 text-teal-400" />
@@ -711,7 +695,6 @@ export default function MessageRoutingCenter() {
               </div>
             </div>
 
-            {/* Quick Actions */}
             <div className="glass-card">
               <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-sage-700">
                 <Settings className="w-5 h-5 text-slate-300" />

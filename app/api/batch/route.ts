@@ -13,7 +13,7 @@ interface BatchItem {
     department: string;
     reply: string;
   };
-  rawResult?: string; // For unstructured responses
+  rawResult?: string;
   error?: string;
   processingTime?: number;
 }
@@ -35,10 +35,8 @@ interface BatchJob {
   processingMode: 'structured' | 'unstructured';
 }
 
-// In-memory storage for demo (in production, use a database)
 const batchJobs = new Map<string, BatchJob>();
 
-// Parse CSV content with better handling
 function parseCSV(content: string): { messages: string[], errors: string[] } {
   const lines = content.split('\n').filter(line => line.trim());
   const messages: string[] = [];
@@ -48,7 +46,6 @@ function parseCSV(content: string): { messages: string[], errors: string[] } {
     return { messages, errors: ['CSV file appears to be empty'] };
   }
   
-  // Check if first line looks like a header
   const firstLine = lines[0].toLowerCase();
   const hasHeader = firstLine.includes('message') || firstLine.includes('text') || firstLine.includes('content');
   const startIndex = hasHeader ? 1 : 0;
@@ -59,26 +56,17 @@ function parseCSV(content: string): { messages: string[], errors: string[] } {
     if (!line) continue;
     
     try {
-      // Handle different CSV formats:
-      // 1. Simple text on each line
-      // 2. Quoted text: "message content"
-      // 3. CSV with commas: "message","other data" (take first column)
-      
       let message = '';
       
       if (line.includes(',')) {
-        // Handle CSV with columns - take the first column
         const columns = line.split(',').map(col => col.trim());
         message = columns[0];
       } else {
-        // Single column format
         message = line;
       }
       
-      // Remove surrounding quotes if present
       message = message.replace(/^"(.*)"$/, '$1').replace(/""/g, '"');
       
-      // Validate message length
       if (message.length < 5) {
         errors.push(`Line ${i + 1}: Message too short (minimum 5 characters): "${message}"`);
         continue;
@@ -98,12 +86,10 @@ function parseCSV(content: string): { messages: string[], errors: string[] } {
   return { messages, errors };
 }
 
-// Process a single message with AI (enhanced error handling)
 async function processMessage(message: string, itemId: string, mode: 'structured' | 'unstructured'): Promise<{ result?: BatchItem['result'], rawResult?: string, processingTime: number }> {
   const startTime = Date.now();
   
   try {
-    // Validate message before processing
     if (!message || message.trim().length === 0) {
       throw new Error('Empty message provided');
     }
@@ -187,27 +173,28 @@ async function processMessage(message: string, itemId: string, mode: 'structured
         processingTime
       };
     } else {
-      // Unstructured processing - raw LLM response
+      // Unstructured processing - natural language response
       const completion = await openai.chat.completions.create({
         model: MODEL,
         messages: [
           {
             role: 'system',
-            content: `You are a customer service AI assistant. Analyze the customer message and provide a comprehensive response that includes:
-            - Your assessment of the sentiment
-            - How urgent this issue seems
-            - Which department should handle this
-            - A helpful response to the customer
-            - Your confidence in this analysis
-            
-            Provide your analysis in a natural, conversational format.`
+            content: `You are a customer service AI assistant. Analyze the customer message and provide a natural, conversational response that addresses their concern.
+
+Write your response as if you're speaking directly to the customer. Include:
+1. An acknowledgment of their sentiment/concern
+2. What department would best handle their request
+3. How urgent their issue seems
+4. A helpful response to their specific question or concern
+
+Write in a warm, professional, conversational tone. Do NOT use JSON format - respond naturally as a human customer service representative would.`
           },
           {
             role: 'user',
             content: message.trim()
           }
         ],
-        temperature: 0.1,
+        temperature: 0.3,
         max_tokens: 500
       });
 
@@ -217,7 +204,6 @@ async function processMessage(message: string, itemId: string, mode: 'structured
       }
 
       const processingTime = Date.now() - startTime;
-      
       
       return {
         rawResult: result,
@@ -231,7 +217,6 @@ async function processMessage(message: string, itemId: string, mode: 'structured
   }
 }
 
-// Handle file upload and create batch job
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -244,12 +229,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Validate file type
     if (!file.name.endsWith('.csv')) {
       return NextResponse.json({ error: 'Please upload a CSV file' }, { status: 400 });
     }
 
-    // Read file content
     const content = await file.text();
     const { messages, errors } = parseCSV(content);
 
@@ -261,16 +244,13 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Log parsing results
     if (errors.length > 0) {
       console.warn(`CSV parsing warnings:`, errors);
     }
 
-    // Create sample messages for validation
     const sampleMessages = messages.slice(0, 3);
     console.log('Sample messages to be processed:', sampleMessages);
 
-    // Create batch job
     const jobId = `batch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const items: BatchItem[] = messages.map((message, index) => ({
       id: `item_${index}`,
@@ -289,7 +269,7 @@ export async function POST(request: NextRequest) {
       successfulItems: 0,
       failedItems: 0,
       startTime: new Date(),
-      estimatedCompletion: new Date(Date.now() + items.length * 3000), // Estimate 3 seconds per item
+      estimatedCompletion: new Date(Date.now() + items.length * 3000),
       items,
       cost: 0,
       processingMode
@@ -297,7 +277,6 @@ export async function POST(request: NextRequest) {
 
     batchJobs.set(jobId, batchJob);
 
-    // Start processing in background
     processJobInBackground(jobId);
 
     return NextResponse.json({
@@ -305,7 +284,7 @@ export async function POST(request: NextRequest) {
       jobId,
       message: `Created batch job with ${items.length} items (${processingMode} mode)`,
       warnings: errors.length > 0 ? errors : undefined,
-      sampleMessages: messages.slice(0, 3), // Show first 3 for verification
+      sampleMessages: messages.slice(0, 3),
       processingMode
     });
 
@@ -318,27 +297,23 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Get batch job status
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const jobId = searchParams.get('jobId');
 
   if (jobId) {
-    // Get specific job
     const job = batchJobs.get(jobId);
     if (!job) {
       return NextResponse.json({ error: 'Job not found' }, { status: 404 });
     }
     return NextResponse.json(job);
   } else {
-    // Get all jobs
     const allJobs = Array.from(batchJobs.values())
       .sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
     return NextResponse.json(allJobs);
   }
 }
 
-// Background processing function
 async function processJobInBackground(jobId: string) {
   const job = batchJobs.get(jobId);
   if (!job) return;
@@ -347,8 +322,8 @@ async function processJobInBackground(jobId: string) {
   batchJobs.set(jobId, job);
   
 
-  const costPerMessage = 0.02; // Estimate cost per message
-
+  const costPerMessage = 0.02;
+  
   for (let i = 0; i < job.items.length; i++) {
     const item = job.items[i];
     item.status = 'processing';
@@ -377,7 +352,6 @@ async function processJobInBackground(jobId: string) {
     job.processedItems++;
     job.progress = (job.processedItems / job.totalItems) * 100;
 
-    // Update estimated completion
     const remainingItems = job.totalItems - job.processedItems;
     const avgTimePerItem = (Date.now() - job.startTime.getTime()) / job.processedItems;
     job.estimatedCompletion = remainingItems > 0
@@ -386,7 +360,6 @@ async function processJobInBackground(jobId: string) {
 
     batchJobs.set(jobId, { ...job });
 
-    // Small delay to prevent overwhelming the API
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 

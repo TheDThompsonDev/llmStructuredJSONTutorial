@@ -1,14 +1,12 @@
 import 'dotenv/config';
 import OpenAI from "openai";
 
-// Centralized OpenAI configuration
-export const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY! 
+export const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!
 });
 
 export const MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-2024-08-06";
 
-// Error types for better error handling
 export class LLMError extends Error {
   constructor(
     message: string,
@@ -27,7 +25,6 @@ export class ValidationError extends Error {
   }
 }
 
-// Retry utility
 export async function withRetry<T>(
   operation: () => Promise<T>,
   maxRetries = 3,
@@ -41,8 +38,7 @@ export async function withRetry<T>(
     } catch (error) {
       lastError = error as Error;
       
-      // Don't retry on validation errors or non-retryable errors
-      if (error instanceof ValidationError || 
+      if (error instanceof ValidationError ||
           (error instanceof LLMError && !error.retryable)) {
         throw error;
       }

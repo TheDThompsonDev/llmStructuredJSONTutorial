@@ -138,7 +138,6 @@ export default function PerformanceComparison({
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      {/* Header */}
       <div className="glass-effect rounded-2xl p-6">
         <div className="text-center space-y-4">
           <h3 className="text-2xl font-bold gradient-text flex items-center justify-center gap-2">
@@ -151,7 +150,6 @@ export default function PerformanceComparison({
         </div>
       </div>
 
-      {/* Current Comparison */}
       {currentComparison && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -164,7 +162,6 @@ export default function PerformanceComparison({
           </h4>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Response Format Result */}
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
               <div className="text-center">
                 <h5 className="font-semibold text-blue-800">Response Format</h5>
@@ -181,7 +178,6 @@ export default function PerformanceComparison({
               </div>
             </div>
             
-            {/* Winner Indicator */}
             <div className="flex items-center justify-center">
               <div className={`p-4 rounded-xl border-2 ${
                 currentComparison.comparison.fasterMethod === 'response_format' 
@@ -204,7 +200,6 @@ export default function PerformanceComparison({
               </div>
             </div>
             
-            {/* Tool Call Result */}
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
               <div className="text-center">
                 <h5 className="font-semibold text-purple-800">Tool Calling</h5>
@@ -224,10 +219,8 @@ export default function PerformanceComparison({
         </motion.div>
       )}
 
-      {/* Historical Metrics */}
       {comparisonData && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Response Format Stats */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -270,7 +263,6 @@ export default function PerformanceComparison({
             </div>
           </motion.div>
 
-          {/* Tool Call Stats */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -315,7 +307,6 @@ export default function PerformanceComparison({
         </div>
       )}
 
-      {/* Performance Insights */}
       {comparisonData && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}

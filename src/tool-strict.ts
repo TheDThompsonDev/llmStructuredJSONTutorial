@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import OpenAI from "openai";
-import { SupportZod, SupportJSONSchema } from "./lib/schemas.js";
+import { SupportZod, SupportJSONSchema, safeJson } from "./lib/schemas";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-2024-08-06";
@@ -27,9 +27,17 @@ async function classifyTool(text: string) {
   const call = completion.choices[0].message.tool_calls?.[0];
   if (!call) throw new Error("No tool call produced");
   if (call.type !== 'function') throw new Error("Expected function tool call");
-  const obj = JSON.parse(call.function.arguments);
-  const parsed = SupportZod.safeParse(obj);
-  if (!parsed.success) throw new Error(parsed.error.message);
+  
+  const jsonResult = safeJson(call.function.arguments);
+  if (!jsonResult.ok) {
+    throw new Error(`Invalid JSON in tool call arguments: ${jsonResult.error}`);
+  }
+  
+  const parsed = SupportZod.safeParse(jsonResult.data);
+  if (!parsed.success) {
+    throw new Error(`Schema validation failed: ${parsed.error.issues.map(i => i.message).join(', ')}`);
+  }
+  
   return parsed.data;
 }
 

@@ -302,7 +302,6 @@ export default function InteractiveDemo() {
     setShowResults(false);
     setProcessedData(null);
 
-    // Simulate processing with progress updates
     const totalTime = step.processingTime;
     const updateInterval = totalTime / 100;
 
@@ -316,7 +315,6 @@ export default function InteractiveDemo() {
       });
     }, updateInterval);
 
-    // Process immediately
     setProcessedData(step.expectedOutput);
     setIsProcessing(false);
     setShowResults(true);
@@ -349,7 +347,6 @@ export default function InteractiveDemo() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white">
-      {/* Navigation */}
       <nav className="bg-black/20 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -373,7 +370,6 @@ export default function InteractiveDemo() {
       </nav>
 
       <div className="container mx-auto px-6 py-8">
-        {/* Header */}
         <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -389,7 +385,6 @@ export default function InteractiveDemo() {
           </motion.div>
         </div>
 
-        {/* Scenario Selector */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {Object.entries(demoScenarios).map(([key, scenario]) => {
             const Icon = scenario.icon;
@@ -420,7 +415,6 @@ export default function InteractiveDemo() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Input Section */}
           <motion.div
             key={selectedScenario}
             initial={{ opacity: 0, x: -20 }}
@@ -455,7 +449,6 @@ export default function InteractiveDemo() {
               </div>
             </div>
 
-            {/* Current Step Info */}
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <step.icon className={`w-5 h-5 ${step.color}`} />
@@ -464,7 +457,6 @@ export default function InteractiveDemo() {
               <p className="text-gray-400">{step.description}</p>
             </div>
 
-            {/* Input Text */}
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-300 mb-3">
                 Input Data:
@@ -476,7 +468,6 @@ export default function InteractiveDemo() {
               </div>
             </div>
 
-            {/* Controls */}
             <div className="flex items-center gap-4">
               <button
                 onClick={runDemo}
@@ -512,7 +503,6 @@ export default function InteractiveDemo() {
               )}
             </div>
 
-            {/* Progress Bar */}
             {isProcessing && (
               <div className="mt-6">
                 <div className="flex items-center justify-between mb-2">
@@ -532,7 +522,6 @@ export default function InteractiveDemo() {
             )}
           </motion.div>
 
-          {/* Output Section */}
           <motion.div
             key={`${selectedScenario}-${currentStep}`}
             initial={{ opacity: 0, x: 20 }}
@@ -565,7 +554,6 @@ export default function InteractiveDemo() {
                     </pre>
                   </div>
 
-                  {/* Key Metrics */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-blue-500/20 rounded-xl p-4 border border-blue-500/30">
                       <div className="text-blue-400 text-sm font-semibold">Processing Time</div>
@@ -579,7 +567,6 @@ export default function InteractiveDemo() {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex gap-3 pt-4">
                     <Link
                       href="/dashboard"
@@ -601,7 +588,6 @@ export default function InteractiveDemo() {
           </motion.div>
         </div>
 
-        {/* Features Showcase */}
         <div className="mt-16 grid md:grid-cols-3 gap-8">
           <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-2xl p-6 border border-blue-500/30">
             <Zap className="w-8 h-8 text-blue-400 mb-4" />

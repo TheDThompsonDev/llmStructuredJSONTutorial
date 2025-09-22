@@ -132,14 +132,12 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 text-white overflow-hidden">
-      {/* Animated Background */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-10 left-10 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/2 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-emerald-500/20 rounded-full blur-3xl animate-pulse delay-2000"></div>
       </div>
 
-      {/* Navigation */}
       <nav className="relative z-10 bg-black/20 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -178,7 +176,6 @@ export default function LandingPage() {
                 <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-emerald-400 group-hover:w-full transition-all duration-300"></div>
               </motion.a>
 
-              {/* Dropdown Menu */}
               <div className="relative group">
                 <motion.button
                   className="text-gray-300 hover:text-white transition-all duration-300 flex items-center gap-1"
@@ -238,7 +235,6 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="relative z-10 container mx-auto px-6 py-20">
         <div className="text-center max-w-4xl mx-auto">
           <motion.div
@@ -305,7 +301,6 @@ export default function LandingPage() {
             </motion.div>
           </motion.div>
 
-          {/* Real-time Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -323,7 +318,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Interactive Use Cases */}
       <section id="usecases" className="relative z-10 py-20 bg-black/20">
         <div className="container mx-auto px-6">
           <motion.div
@@ -339,7 +333,6 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Use Case Selector */}
             <div className="space-y-4">
               {businessUseCases.map((useCase, index) => {
                 const Icon = useCase.icon;
@@ -360,7 +353,6 @@ export default function LandingPage() {
                         : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
                     }`}
                   >
-                    {/* Hover effect overlay */}
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
                     <div className="flex items-start gap-4 relative z-10">
@@ -405,7 +397,6 @@ export default function LandingPage() {
                       </motion.div>
                     </div>
 
-                    {/* Progressive disclosure - show features on hover when not active */}
                     <AnimatePresence>
                       {!isActive && (
                         <motion.div
@@ -439,7 +430,6 @@ export default function LandingPage() {
               })}
             </div>
 
-            {/* Active Use Case Details */}
             <motion.div
               key={activeUseCase.id}
               initial={{ opacity: 0, y: 20 }}
@@ -487,7 +477,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
       <section id="testimonials" className="relative z-10 py-20">
         <div className="container mx-auto px-6">
           <motion.div
@@ -550,7 +539,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="relative z-10 py-20 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
         <div className="container mx-auto px-6 text-center">
           <motion.div
@@ -584,7 +572,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="relative z-10 bg-black/40 backdrop-blur-xl border-t border-white/10 py-12">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8">

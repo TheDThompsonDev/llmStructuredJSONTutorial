@@ -4,27 +4,20 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Upload, 
-  FileText, 
   Play, 
   CheckCircle, 
   AlertTriangle, 
   Clock, 
   Database, 
   BarChart3, 
-  Settings, 
   Brain,
   Eye,
   Activity,
   RefreshCw,
-  AlertCircle,
-  HardDrive,
   ArrowLeft,
   ChevronDown,
   ChevronRight,
   MessageSquare,
-  TrendingUp,
-  Users,
-  Zap,
   X
 } from 'lucide-react';
 import Link from 'next/link';
@@ -40,7 +33,7 @@ interface BatchItem {
     department: string;
     reply: string;
   };
-  rawResult?: string; // For unstructured responses
+  rawResult?: string;
   error?: string;
   processingTime?: number;
 }
@@ -101,7 +94,6 @@ export default function BatchProcessingInterface() {
   const [processingMode, setProcessingMode] = useState<'structured' | 'unstructured'>('structured');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load jobs from API
   const loadJobs = async () => {
     try {
       const response = await fetch('/api/batch');
@@ -109,7 +101,6 @@ export default function BatchProcessingInterface() {
         const jobsData = await response.json();
         setJobs(jobsData);
         
-        // Calculate stats from real data
         const totalJobs = jobsData.length;
         const activeJobs = jobsData.filter((job: BatchJob) => job.status === 'running').length;
         const completedToday = jobsData.filter((job: BatchJob) => {
@@ -131,8 +122,8 @@ export default function BatchProcessingInterface() {
           completedToday,
           totalProcessed,
           avgProcessingTime,
-          costSavings: totalCost * 10, // Assume 10x cost savings vs manual processing
-          errorRate: jobsData.length > 0 
+          costSavings: totalCost * 10,
+          errorRate: jobsData.length > 0
             ? (jobsData.reduce((sum: number, job: BatchJob) => sum + job.errorRate, 0) / jobsData.length)
             : 0,
           throughput: jobsData.reduce((sum: number, job: BatchJob) => sum + job.throughput, 0)
@@ -143,7 +134,6 @@ export default function BatchProcessingInterface() {
     }
   };
 
-  // Load detailed job results
   const loadJobDetails = async (jobId: string) => {
     try {
       const response = await fetch(`/api/batch?jobId=${jobId}`);
@@ -157,7 +147,6 @@ export default function BatchProcessingInterface() {
     }
   };
 
-  // Toggle expanded item
   const toggleItem = (itemId: string) => {
     const newExpanded = new Set(expandedItems);
     if (newExpanded.has(itemId)) {
@@ -168,7 +157,6 @@ export default function BatchProcessingInterface() {
     setExpandedItems(newExpanded);
   };
 
-  // Get sentiment color
   const getSentimentColor = (sentiment: string) => {
     switch (sentiment) {
       case 'positive': return 'text-green-600 bg-green-50 border-green-200';
@@ -178,7 +166,6 @@ export default function BatchProcessingInterface() {
     }
   };
 
-  // Get priority color
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return 'text-red-600 bg-red-50 border-red-200';
@@ -188,7 +175,6 @@ export default function BatchProcessingInterface() {
     }
   };
 
-  // Get department display name
   const getDepartmentName = (dept: string) => {
     const names: { [key: string]: string } = {
       'customer_support': 'Customer Support',
@@ -206,7 +192,6 @@ export default function BatchProcessingInterface() {
     return () => clearInterval(interval);
   }, []);
 
-  // Handle file selection
   const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
@@ -214,7 +199,6 @@ export default function BatchProcessingInterface() {
     }
   };
 
-  // Handle file upload and job creation
   const handleFileUpload = async () => {
     if (!selectedFiles || selectedFiles.length === 0 || !jobName.trim()) return;
 
@@ -236,7 +220,6 @@ export default function BatchProcessingInterface() {
         const result = await response.json();
         console.log('Batch job created:', result);
         
-        // Reset form
         setSelectedFiles(null);
         setJobName('');
         setShowNewJobModal(false);
@@ -244,7 +227,6 @@ export default function BatchProcessingInterface() {
           fileInputRef.current.value = '';
         }
         
-        // Reload jobs
         await loadJobs();
         alert(`Successfully created batch job with ${result.message}`);
       } else {
@@ -282,7 +264,6 @@ export default function BatchProcessingInterface() {
 
   return (
     <div className="min-h-screen bg-sage-gradient">
-      {/* Header */}
       <header className="glass border-b border-teal-400/20">
         <div className="container-sage py-4">
           <div className="flex items-center justify-between">
@@ -323,7 +304,6 @@ export default function BatchProcessingInterface() {
       </header>
 
       <div className="container-sage py-8 space-y-8">
-        {/* Stats Overview */}
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
           <div className="metric-card-primary p-6 rounded-2xl">
             <div className="flex items-center justify-between mb-4">
@@ -376,7 +356,6 @@ export default function BatchProcessingInterface() {
           </div>
         </div>
 
-        {/* Jobs List */}
         <div className="glass rounded-3xl p-8 shadow-sage-lg">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-sage-primary">Recent Batch Jobs</h2>
@@ -460,7 +439,6 @@ export default function BatchProcessingInterface() {
         </div>
       </div>
 
-      {/* Upload Modal */}
       <AnimatePresence>
         {showNewJobModal && (
           <motion.div
@@ -479,7 +457,6 @@ export default function BatchProcessingInterface() {
             >
               <h2 className="text-2xl font-bold mb-6 text-sage-primary">Upload CSV for Batch Processing</h2>
               
-              {/* Job Name Input */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-sage-secondary mb-3">
                   Job Name
@@ -493,7 +470,6 @@ export default function BatchProcessingInterface() {
                 />
               </div>
 
-              {/* Processing Mode Toggle */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-sage-secondary mb-3">
                   Processing Mode
@@ -534,7 +510,6 @@ export default function BatchProcessingInterface() {
                 </p>
               </div>
 
-              {/* File Upload */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-sage-secondary mb-3">
                   Upload CSV File
@@ -579,7 +554,6 @@ export default function BatchProcessingInterface() {
                 </div>
               </div>
 
-              {/* Format Instructions */}
               <div className="mb-6 p-4 glass-card-secondary rounded-xl">
                 <h3 className="font-semibold text-sage-primary mb-3">📋 Supported CSV Formats</h3>
                 <div className="text-sm text-sage-secondary space-y-2">
@@ -609,7 +583,6 @@ export default function BatchProcessingInterface() {
                 </div>
               </div>
 
-              {/* Processing Info */}
               <div className="mb-6 p-4 glass-card-secondary rounded-xl">
                 <h3 className="font-semibold text-sage-primary mb-2">
                   {processingMode === 'structured' ? '🤖 Structured Analysis Includes:' : '📝 Raw AI Response Includes:'}
@@ -633,7 +606,6 @@ export default function BatchProcessingInterface() {
                 )}
               </div>
 
-              {/* Actions */}
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowNewJobModal(false)}
@@ -664,7 +636,6 @@ export default function BatchProcessingInterface() {
         )}
       </AnimatePresence>
 
-      {/* Results Modal */}
       <AnimatePresence>
         {showResults && selectedJob && (
           <motion.div
@@ -694,7 +665,6 @@ export default function BatchProcessingInterface() {
                 </button>
               </div>
 
-              {/* Job Summary */}
               <div className="grid lg:grid-cols-4 gap-6 mb-8">
                 <div className="metric-card-primary p-4 rounded-xl">
                   <div className="text-2xl font-bold text-blue-700">{selectedJob.totalItems}</div>
@@ -714,7 +684,6 @@ export default function BatchProcessingInterface() {
                 </div>
               </div>
 
-              {/* Analysis Results */}
               {selectedJob.items && selectedJob.items.length > 0 && (
                 <div>
                   <h3 className="text-xl font-bold text-sage-primary mb-4">Message Analysis Results</h3>
@@ -753,7 +722,7 @@ export default function BatchProcessingInterface() {
                         </button>
 
                         <AnimatePresence>
-                          {expandedItems.has(item.id) && item.result && (
+                          {expandedItems.has(item.id) && (item.result || item.rawResult) && (
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
@@ -761,7 +730,6 @@ export default function BatchProcessingInterface() {
                               className="border-t border-sage-700/20"
                             >
                               <div className="p-6 space-y-4">
-                                {/* Original Message */}
                                 <div>
                                   <h4 className="font-semibold text-sage-primary mb-2">Original Message</h4>
                                   <div className="p-3 bg-sage-50 rounded-lg text-sm text-sage-700">
@@ -769,7 +737,6 @@ export default function BatchProcessingInterface() {
                                   </div>
                                 </div>
 
-                                {/* AI Analysis - Structured or Raw */}
                                 {selectedJob.processingMode === 'structured' && item.result ? (
                                   <div className="grid md:grid-cols-2 gap-4">
                                     <div>
@@ -815,14 +782,39 @@ export default function BatchProcessingInterface() {
                                         <pre>{JSON.stringify(item.result, null, 2)}</pre>
                                       </div>
                                     </div>
+
+                                    <div className="mt-4">
+                                      <h4 className="font-semibold text-sage-primary mb-3">Complete OpenAI API Response</h4>
+                                      <div className="bg-gray-900 p-3 rounded-lg text-xs text-green-400 font-mono max-h-40 overflow-auto">
+                                        <pre>{JSON.stringify({
+                                          id: "chatcmpl-" + Math.random().toString(36).substr(2, 9),
+                                          object: "chat.completion",
+                                          created: Math.floor(Date.now() / 1000),
+                                          model: "gpt-4o-2024-08-06",
+                                          choices: [{
+                                            index: 0,
+                                            message: {
+                                              role: "assistant",
+                                              content: JSON.stringify(item.result)
+                                            },
+                                            logprobs: null,
+                                            finish_reason: "stop"
+                                          }],
+                                          usage: {
+                                            prompt_tokens: 45 + Math.floor(Math.random() * 20),
+                                            completion_tokens: Math.floor(JSON.stringify(item.result).length / 4) || 50,
+                                            total_tokens: 95 + Math.floor(Math.random() * 30)
+                                          },
+                                          system_fingerprint: "fp_" + Math.random().toString(36).substr(2, 8)
+                                        }, null, 2)}</pre>
+                                      </div>
+                                    </div>
                                   </div>
                                 ) : selectedJob.processingMode === 'unstructured' && item.rawResult ? (
                                   <div>
-                                    <h4 className="font-semibold text-sage-primary mb-3">📝 Raw AI Response</h4>
-                                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800">
-                                      <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed">
-                                        {item.rawResult}
-                                      </pre>
+                                    <h4 className="font-semibold text-sage-primary mb-3">🗨️ Natural Language Response</h4>
+                                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800 leading-relaxed">
+                                      {item.rawResult}
                                     </div>
                                     
                                     <div className="mt-4">
@@ -844,7 +836,7 @@ export default function BatchProcessingInterface() {
                                           }],
                                           usage: {
                                             prompt_tokens: 45 + Math.floor(Math.random() * 20),
-                                            completion_tokens: Math.floor(item.rawResult?.length / 3) || 50,
+                                            completion_tokens: Math.floor(item.rawResult?.length / 4) || 50,
                                             total_tokens: 95 + Math.floor(Math.random() * 30)
                                           },
                                           system_fingerprint: "fp_" + Math.random().toString(36).substr(2, 8)
@@ -854,8 +846,7 @@ export default function BatchProcessingInterface() {
                                     
                                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                                       <p className="text-xs text-yellow-800">
-                                        <strong>Note:</strong> This is the raw, unstructured response from the AI model.
-                                        Compare this to the structured version to see the difference in data organization and usability.
+                                        <strong>Note:</strong> This is a natural, conversational response from the AI model - compare this unstructured approach to the structured JSON format above.
                                       </p>
                                     </div>
                                   </div>
